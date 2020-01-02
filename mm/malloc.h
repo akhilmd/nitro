@@ -26,6 +26,8 @@ char *mm_stats();
 
 size_t mm_sizeat(void *);
 
+void mm_prof();
+
 size_t mm_size();
 
 int mm_free2os();

@@ -13,7 +13,7 @@
 #ifdef JEMALLOC
 #include <jemalloc/jemalloc.h>
 
-const char* je_malloc_conf = "narenas:2";
+const char* je_malloc_conf = "prof:true,prof_prefix:jeprof.out,narenas:2";
 
 void writecb(void *ref, const char *s) {
 	stats_buf *buf = (stats_buf *)(ref);
@@ -42,7 +42,7 @@ char *doStats()  {
 
 void *mm_malloc(size_t sz) {
 #ifdef JEMALLOC
-    return je_malloc(sz);
+    return je_calloc(1, sz);
 #else
     return malloc(sz);
 #endif
@@ -69,6 +69,21 @@ size_t mm_sizeat(void *p) {
     return je_sallocx(p, 0);
 #else
     return 0;
+#endif
+}
+
+void mm_prof() {
+#ifdef JEMALLOC
+    // Force stats cache flush
+    uint64_t epoch = 1;
+    size_t sz = sizeof(epoch);
+    je_mallctl("epoch", &epoch, &sz, &epoch, sz);
+
+    je_mallctl("prof.dump", NULL, NULL, NULL, 0);
+    // je_mallctl("stats.resident", &resident, &sz, NULL, 0);
+    // return resident;
+#else
+    return;
 #endif
 }
 

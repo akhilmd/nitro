@@ -79,6 +79,11 @@ func Size() uint64 {
 	return uint64(C.mm_size())
 }
 
+// Size returns total size allocated by mm allocator
+func Prof() {
+	C.mm_prof()
+}
+
 func GetAllocStats() (uint64, uint64) {
 	return stats.allocs, stats.frees
 }
